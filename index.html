@@ -1,0 +1,1279 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Advanced Meteor Impact Analysis - NASA PDCO</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        :root {
+            --nasa-blue: #0B3D91;
+            --nasa-red: #FC3D21;
+            --nasa-dark: #1a1a2e;
+            --space-black: #000000;
+            --star-white: #ffffff;
+            --team-green: #00ff88;
+            --team-purple: #8a2be2;
+            --impact-orange: #ff6b35;
+            --crater-brown: #8B4513;
+            --expert-gold: #FFD700;
+            --tech-blue: #00b4d8;
+            --data-green: #38b000;
+        }
+
+        body {
+            background: linear-gradient(135deg, #0a0a2e, #000000);
+            color: var(--star-white);
+            line-height: 1.6;
+            overflow-x: hidden;
+        }
+
+        .container {
+            width: 90%;
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+
+        /* Enhanced Header */
+        .expert-header {
+            background: linear-gradient(135deg, rgba(11, 61, 145, 0.95), rgba(26, 26, 46, 0.98));
+            backdrop-filter: blur(20px);
+            padding: 15px 0;
+            border-bottom: 3px solid var(--expert-gold);
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 1000;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.5);
+        }
+
+        .header-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+        }
+
+        .expert-logo {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+        }
+
+        .logo-badge {
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(45deg, var(--team-purple), var(--team-green));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 3px solid var(--expert-gold);
+            box-shadow: 0 0 20px rgba(255, 215, 0, 0.3);
+        }
+
+        .logo-badge i {
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .logo-text {
+            display: flex;
+            flex-direction: column;
+        }
+
+        .logo-text h1 {
+            font-size: 1.8rem;
+            font-weight: 800;
+            background: linear-gradient(45deg, var(--expert-gold), var(--team-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+        }
+
+        .expert-tag {
+            font-size: 0.8rem;
+            color: var(--tech-blue);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .expert-nav ul {
+            display: flex;
+            list-style: none;
+            gap: 30px;
+            flex-wrap: wrap;
+        }
+
+        .expert-nav a {
+            color: white;
+            text-decoration: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .expert-nav a::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.1), transparent);
+            transition: left 0.5s;
+        }
+
+        .expert-nav a:hover::before {
+            left: 100%;
+        }
+
+        .expert-nav a:hover {
+            background: rgba(255, 255, 255, 0.1);
+            border-color: var(--expert-gold);
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(255, 215, 0, 0.3);
+        }
+
+        /* Enhanced Hero Section */
+        .expert-hero {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.8), rgba(0, 0, 0, 0.9)), 
+                        url('https://images.unsplash.com/photo-1462331940025-496dfbfc7564?ixlib=rb-4.0.3&ixid=M3wxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8fA%3D%3D&auto=format&fit=crop&w=2070&q=80');
+            background-size: cover;
+            background-position: center;
+            background-attachment: fixed;
+            position: relative;
+            margin-top: 80px;
+        }
+
+        .hero-content {
+            max-width: 1000px;
+            margin: 0 auto;
+            text-align: center;
+        }
+
+        .hero-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: rgba(255, 215, 0, 0.1);
+            padding: 10px 20px;
+            border-radius: 25px;
+            border: 2px solid var(--expert-gold);
+            margin-bottom: 30px;
+            backdrop-filter: blur(10px);
+        }
+
+        .hero-badge i {
+            color: var(--expert-gold);
+        }
+
+        .hero-badge span {
+            color: var(--expert-gold);
+            font-weight: 600;
+            letter-spacing: 1px;
+        }
+
+        .hero h2 {
+            font-size: 4rem;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--expert-gold), var(--tech-blue), var(--team-green));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            text-shadow: 0 0 30px rgba(255, 215, 0, 0.3);
+        }
+
+        .hero-subtitle {
+            font-size: 1.5rem;
+            margin-bottom: 40px;
+            color: #ccc;
+            font-weight: 300;
+        }
+
+        .expert-btn {
+            display: inline-flex;
+            align-items: center;
+            gap: 10px;
+            background: linear-gradient(45deg, var(--nasa-red), var(--impact-orange));
+            color: white;
+            padding: 18px 40px;
+            border-radius: 50px;
+            text-decoration: none;
+            font-weight: 700;
+            font-size: 1.1rem;
+            border: none;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            box-shadow: 0 8px 25px rgba(252, 61, 33, 0.4);
+            position: relative;
+            overflow: hidden;
+        }
+
+        .expert-btn::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+            transition: left 0.5s;
+        }
+
+        .expert-btn:hover::before {
+            left: 100%;
+        }
+
+        .expert-btn:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(252, 61, 33, 0.6);
+        }
+
+        /* Enhanced Dashboard */
+        .expert-dashboard {
+            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(11, 61, 145, 0.05), rgba(26, 26, 46, 0.1));
+        }
+
+        .dashboard-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .dashboard-card {
+            background: linear-gradient(145deg, rgba(26,26,46,0.8), rgba(11,61,145,0.3));
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .dashboard-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            height: 4px;
+            background: linear-gradient(90deg, var(--team-green), var(--tech-blue), var(--expert-gold));
+        }
+
+        .dashboard-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--tech-blue);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        .card-header {
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            margin-bottom: 20px;
+        }
+
+        .card-header i {
+            font-size: 2rem;
+            color: var(--tech-blue);
+        }
+
+        .card-header h3 {
+            color: var(--expert-gold);
+            font-size: 1.4rem;
+        }
+
+        .metric-value {
+            font-size: 2.5rem;
+            font-weight: 800;
+            color: var(--data-green);
+            margin: 15px 0;
+        }
+
+        .metric-label {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        /* Enhanced Simulation */
+        .advanced-simulation {
+            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(255,107,53,0.05), rgba(139,69,19,0.1));
+        }
+
+        .simulation-interface {
+            background: linear-gradient(145deg, rgba(26,26,46,0.9), rgba(11,61,145,0.4));
+            border-radius: 20px;
+            padding: 40px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            margin-top: 40px;
+        }
+
+        .control-panel {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 25px;
+            margin-bottom: 40px;
+        }
+
+        .control-group {
+            background: rgba(255, 255, 255, 0.05);
+            padding: 20px;
+            border-radius: 15px;
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .control-label {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-bottom: 15px;
+            color: var(--tech-blue);
+            font-weight: 600;
+        }
+
+        .control-label i {
+            font-size: 1.2rem;
+        }
+
+        /* Enhanced Buttons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+            margin-top: 30px;
+        }
+
+        .btn-primary {
+            background: linear-gradient(45deg, var(--nasa-red), var(--impact-orange));
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-secondary {
+            background: linear-gradient(45deg, var(--tech-blue), #0096c7);
+            color: white;
+            padding: 15px 30px;
+            border-radius: 10px;
+            border: none;
+            cursor: pointer;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .btn-primary:hover, .btn-secondary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* Enhanced Data Visualization */
+        .data-viz {
+            background: linear-gradient(135deg, rgba(0, 180, 216, 0.05), rgba(0, 255, 136, 0.1));
+            padding: 100px 0;
+        }
+
+        .viz-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(400px, 1fr));
+            gap: 30px;
+            margin-top: 40px;
+        }
+
+        .viz-card {
+            background: linear-gradient(145deg, rgba(26,26,46,0.8), rgba(11,61,145,0.3));
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+        }
+
+        /* Mitigation Strategies Section */
+        .mitigation-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(0, 255, 136, 0.05), rgba(138, 43, 226, 0.1));
+        }
+
+        .mitigation-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .mitigation-card {
+            background: linear-gradient(145deg, rgba(26,26,46,0.8), rgba(11,61,145,0.3));
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .mitigation-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--team-green);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Research Section */
+        .research-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(255, 215, 0, 0.05), rgba(0, 180, 216, 0.1));
+        }
+
+        .research-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(350px, 1fr));
+            gap: 30px;
+            margin-top: 50px;
+        }
+
+        .research-card {
+            background: linear-gradient(145deg, rgba(26,26,46,0.8), rgba(11,61,145,0.3));
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            transition: all 0.3s ease;
+        }
+
+        .research-card:hover {
+            transform: translateY(-10px);
+            border-color: var(--expert-gold);
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
+        }
+
+        /* Chat Bot Styles */
+        .chat-bot {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            z-index: 1000;
+            width: 70px;
+            height: 70px;
+            background: linear-gradient(135deg, var(--team-purple), var(--team-green));
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            box-shadow: 0 8px 25px rgba(138, 43, 226, 0.5);
+            transition: all 0.3s ease;
+            border: 3px solid rgba(255, 255, 255, 0.2);
+            animation: float 3s ease-in-out infinite;
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+
+        .chat-bot:hover {
+            transform: scale(1.1);
+            box-shadow: 0 12px 30px rgba(138, 43, 226, 0.7);
+        }
+
+        .chat-bot i {
+            font-size: 1.8rem;
+            color: white;
+        }
+
+        .chat-window {
+            position: fixed;
+            bottom: 120px;
+            right: 30px;
+            width: 380px;
+            height: 550px;
+            background: rgba(26, 26, 46, 0.95);
+            border-radius: 20px;
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
+            z-index: 1001;
+            display: none;
+            flex-direction: column;
+            border: 2px solid var(--team-purple);
+            backdrop-filter: blur(10px);
+        }
+
+        .chat-header {
+            background: linear-gradient(135deg, var(--team-purple), var(--team-green));
+            padding: 20px;
+            border-radius: 20px 20px 0 0;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+        }
+
+        .chat-header h3 {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            font-size: 1.2rem;
+        }
+
+        .close-chat {
+            background: none;
+            border: none;
+            color: white;
+            font-size: 1.2rem;
+            cursor: pointer;
+        }
+
+        .chat-messages {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .message {
+            max-width: 80%;
+            padding: 15px;
+            border-radius: 18px;
+            line-height: 1.4;
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .bot-message {
+            background: var(--nasa-blue);
+            color: white;
+            align-self: flex-start;
+            border-bottom-left-radius: 5px;
+        }
+
+        .user-message {
+            background: linear-gradient(135deg, var(--team-purple), var(--team-green));
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 5px;
+        }
+
+        .chat-input {
+            display: flex;
+            padding: 20px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            gap: 10px;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 15px;
+            border-radius: 25px;
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            background: rgba(255, 255, 255, 0.1);
+            color: white;
+            outline: none;
+        }
+
+        .chat-input button {
+            background: var(--team-green);
+            color: white;
+            border: none;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+
+        .chat-input button:hover {
+            background: var(--team-purple);
+            transform: scale(1.1);
+        }
+
+        /* Enhanced Footer */
+        .expert-footer {
+            background: linear-gradient(135deg, var(--nasa-dark), #000000);
+            padding: 60px 0 20px;
+            border-top: 3px solid var(--expert-gold);
+        }
+
+        .footer-content {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 40px;
+            margin-bottom: 40px;
+        }
+
+        .footer-section h3 {
+            color: var(--expert-gold);
+            margin-bottom: 20px;
+            font-size: 1.3rem;
+        }
+
+        .footer-section ul {
+            list-style: none;
+        }
+
+        .footer-section li {
+            margin-bottom: 10px;
+        }
+
+        .footer-section a {
+            color: #ccc;
+            text-decoration: none;
+            transition: color 0.3s ease;
+        }
+
+        .footer-section a:hover {
+            color: var(--tech-blue);
+        }
+
+        .copyright {
+            text-align: center;
+            padding-top: 30px;
+            border-top: 1px solid rgba(255, 255, 255, 0.1);
+            color: #888;
+        }
+
+        /* Enhanced Section Titles */
+        .section-title {
+            font-size: 3rem;
+            text-align: center;
+            margin-bottom: 20px;
+            background: linear-gradient(45deg, var(--expert-gold), var(--tech-blue));
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            background-clip: text;
+            position: relative;
+        }
+
+        .section-title::after {
+            content: '';
+            display: block;
+            width: 100px;
+            height: 4px;
+            background: linear-gradient(90deg, var(--team-green), var(--tech-blue), var(--expert-gold));
+            margin: 20px auto;
+            border-radius: 2px;
+        }
+
+        .section-subtitle {
+            text-align: center;
+            color: #ccc;
+            font-size: 1.2rem;
+            margin-bottom: 50px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            .expert-nav ul {
+                gap: 15px;
+            }
+
+            .hero h2 {
+                font-size: 2.5rem;
+            }
+
+            .dashboard-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .control-panel {
+                grid-template-columns: 1fr;
+            }
+
+            .chat-window {
+                width: 320px;
+                right: 20px;
+            }
+        }
+
+        /* Professional Animations */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(30px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .animate-fadeInUp {
+            animation: fadeInUp 0.8s ease-out;
+        }
+    </style>
+</head>
+<body>
+    <!-- Enhanced Header -->
+    <header class="expert-header">
+        <div class="container header-content">
+            <div class="expert-logo">
+                <div class="logo-badge">
+                    <i class="fas fa-satellite-dish"></i>
+                </div>
+                <div class="logo-text">
+                    <h1>Advanced Impact Analysis</h1>
+                    <div class="expert-tag">NASA PLANETARY DEFENSE COORDINATION OFFICE</div>
+                </div>
+            </div>
+            <nav class="expert-nav">
+                <ul>
+                    <li><a href="#dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
+                    <li><a href="#simulation"><i class="fas fa-cogs"></i> Simulation</a></li>
+                    <li><a href="#data"><i class="fas fa-database"></i> Data Analytics</a></li>
+                    <li><a href="#mitigation"><i class="fas fa-shield-alt"></i> Mitigation</a></li>
+                    <li><a href="#research"><i class="fas fa-microscope"></i> Research</a></li>
+                </ul>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Enhanced Hero Section -->
+    <section class="expert-hero" id="home">
+        <div class="container hero-content">
+            <div class="hero-badge">
+                <i class="fas fa-certificate"></i>
+                <span>EXPERT ANALYSIS PLATFORM</span>
+            </div>
+            <h2>Advanced Meteor Impact Analysis</h2>
+            <p class="hero-subtitle">Comprehensive planetary defense simulation and threat assessment platform for NASA experts and researchers</p>
+            <a href="#simulation" class="expert-btn">
+                <i class="fas fa-play-circle"></i>
+                Launch Advanced Simulation
+            </a>
+        </div>
+    </section>
+
+    <!-- Expert Dashboard -->
+    <section class="expert-dashboard" id="dashboard">
+        <div class="container">
+            <h2 class="section-title">Threat Assessment Dashboard</h2>
+            <p class="section-subtitle">Real-time monitoring of near-Earth objects and impact probability analysis</p>
+            
+            <div class="dashboard-grid">
+                <div class="dashboard-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-bullseye"></i>
+                        <h3>Current Threats</h3>
+                    </div>
+                    <div class="metric-value">0</div>
+                    <p class="metric-label">Immediate impact risks detected</p>
+                </div>
+                
+                <div class="dashboard-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-satellite"></i>
+                        <h3>NEOs Tracked</h3>
+                    </div>
+                    <div class="metric-value">28,543</div>
+                    <p class="metric-label">Near-Earth Objects monitored</p>
+                </div>
+                
+                <div class="dashboard-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-chart-bar"></i>
+                        <h3>Impact Probability</h3>
+                    </div>
+                    <div class="metric-value">0.002%</div>
+                    <p class="metric-label">Next 100 years cumulative risk</p>
+                </div>
+                
+                <div class="dashboard-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-shield-alt"></i>
+                        <h3>Defense Readiness</h3>
+                    </div>
+                    <div class="metric-value">94%</div>
+                    <p class="metric-label">Planetary defense systems operational</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Advanced Simulation Section -->
+    <section class="advanced-simulation" id="simulation">
+        <div class="container">
+            <h2 class="section-title">Advanced Impact Simulation</h2>
+            <p class="section-subtitle">High-fidelity modeling of asteroid impacts with multi-parameter analysis</p>
+            
+            <div class="simulation-interface">
+                <div class="control-panel">
+                    <div class="control-group">
+                        <div class="control-label">
+                            <i class="fas fa-arrows-alt-h"></i>
+                            <span>Asteroid Diameter</span>
+                        </div>
+                        <input type="range" min="10" max="10000" value="500" class="slider">
+                        <div class="value-display">500 meters</div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-label">
+                            <i class="fas fa-tachometer-alt"></i>
+                            <span>Impact Velocity</span>
+                        </div>
+                        <input type="range" min="1" max="72" value="17" class="slider">
+                        <div class="value-display">17 km/s</div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-label">
+                            <i class="fas fa-angle-double-right"></i>
+                            <span>Impact Angle</span>
+                        </div>
+                        <input type="range" min="5" max="90" value="45" class="slider">
+                        <div class="value-display">45 degrees</div>
+                    </div>
+                    
+                    <div class="control-group">
+                        <div class="control-label">
+                            <i class="fas fa-globe-americas"></i>
+                            <span>Target Composition</span>
+                        </div>
+                        <select class="expert-select">
+                            <option>Continental Crust</option>
+                            <option>Oceanic Crust</option>
+                            <option>Urban Area</option>
+                            <option>Ice Sheet</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <div class="btn-group">
+                    <button class="btn-primary" onclick="runAdvancedSimulation()">
+                        <i class="fas fa-calculator"></i>
+                        Run Simulation
+                    </button>
+                    <button class="btn-secondary">
+                        <i class="fas fa-download"></i>
+                        Export Data
+                    </button>
+                    <button class="btn-secondary">
+                        <i class="fas fa-chart-line"></i>
+                        Advanced Analytics
+                    </button>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Data Visualization Section -->
+    <section class="data-viz" id="data">
+        <div class="container">
+            <h2 class="section-title">Impact Data Analytics</h2>
+            <p class="section-subtitle">Advanced visualization of impact effects and risk assessment metrics</p>
+            
+            <div class="viz-container">
+                <div class="viz-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-fire"></i>
+                        <h3>Energy Distribution</h3>
+                    </div>
+                    <p>Thermal radiation and shockwave propagation analysis</p>
+                </div>
+                
+                <div class="viz-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-mountain"></i>
+                        <h3>Crater Formation</h3>
+                    </div>
+                    <p>3D modeling of transient and final crater dimensions</p>
+                </div>
+                
+                <div class="viz-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-wave-square"></i>
+                        <h3>Seismic Effects</h3>
+                    </div>
+                    <p>Earthquake magnitude and ground motion simulation</p>
+                </div>
+                
+                <div class="viz-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-water"></i>
+                        <h3>Tsunami Modeling</h3>
+                    </div>
+                    <p>Ocean impact wave propagation and coastal effects</p>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Mitigation Strategies Section -->
+    <section class="mitigation-section" id="mitigation">
+        <div class="container">
+            <h2 class="section-title">Mitigation Strategies</h2>
+            <p class="section-subtitle">Advanced planetary defense technologies and intervention methods</p>
+            
+            <div class="mitigation-grid">
+                <div class="mitigation-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-space-shuttle"></i>
+                        <h3>Kinetic Impact</h3>
+                    </div>
+                    <p>DART mission proven technology for asteroid deflection through direct impact</p>
+                    <div class="metric-value">Success: 2022</div>
+                </div>
+                
+                <div class="mitigation-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-magnet"></i>
+                        <h3>Gravity Tractor</h3>
+                    </div>
+                    <p>Using spacecraft gravity to gradually alter asteroid trajectories over time</p>
+                    <div class="metric-value">Ready: 2026</div>
+                </div>
+                
+                <div class="mitigation-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-atom"></i>
+                        <h3>Nuclear Deflection</h3>
+                    </div>
+                    <p>Controlled nuclear detonations for immediate threat response and trajectory alteration</p>
+                    <div class="metric-value">Emergency Only</div>
+                </div>
+                
+                <div class="mitigation-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-solar-panel"></i>
+                        <h3>Laser Ablation</h3>
+                    </div>
+                    <p>Focused laser systems to vaporize surface material and create thrust</p>
+                    <div class="metric-value">Development</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Research Section -->
+    <section class="research-section" id="research">
+        <div class="container">
+            <h2 class="section-title">Research & Development</h2>
+            <p class="section-subtitle">Cutting-edge research in planetary defense and impact science</p>
+            
+            <div class="research-grid">
+                <div class="research-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-search"></i>
+                        <h3>NEO Surveyor</h3>
+                    </div>
+                    <p>Next-generation space telescope for detecting 90% of NEOs larger than 140m</p>
+                    <div class="metric-value">Launch: 2026</div>
+                </div>
+                
+                <div class="research-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-brain"></i>
+                        <h3>AI Prediction Models</h3>
+                    </div>
+                    <p>Machine learning algorithms for impact probability and trajectory forecasting</p>
+                    <div class="metric-value">Accuracy: 98.7%</div>
+                </div>
+                
+                <div class="research-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-vial"></i>
+                        <h3>Material Science</h3>
+                    </div>
+                    <p>Advanced materials research for improved impact resistance and deflection efficiency</p>
+                    <div class="metric-value">Ongoing</div>
+                </div>
+                
+                <div class="research-card animate-fadeInUp">
+                    <div class="card-header">
+                        <i class="fas fa-handshake"></i>
+                        <h3>International Collaboration</h3>
+                    </div>
+                    <p>Global partnerships for coordinated planetary defense initiatives and data sharing</p>
+                    <div class="metric-value">18 Agencies</div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+    <!-- Chat Bot -->
+    <div class="chat-bot" id="chatBot">
+        <i class="fas fa-robot"></i>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <h3><i class="fas fa-robot"></i> NASA Assistant</h3>
+            <button class="close-chat" id="closeChat"><i class="fas fa-times"></i></button>
+        </div>
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot-message">
+                Hello! I'm your NASA Assistant. How can I help you with planetary defense and meteor impact analysis today?
+            </div>
+        </div>
+        <div class="chat-input">
+            <input type="text" id="chatInput" placeholder="Ask about meteors, defense, or research...">
+            <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
+        </div>
+    </div>
+
+    <!-- Enhanced Footer -->
+    <footer class="expert-footer">
+        <div class="container">
+            <div class="footer-content">
+                <div class="footer-section">
+                    <h3>NASA PDCO</h3>
+                    <p>Planetary Defense Coordination Office<br>
+                    Advanced Threat Analysis Division</p>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Quick Access</h3>
+                    <ul>
+                        <li><a href="#dashboard">Threat Dashboard</a></li>
+                        <li><a href="#simulation">Impact Simulation</a></li>
+                        <li><a href="#data">Data Analytics</a></li>
+                        <li><a href="#research">Research Papers</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Resources</h3>
+                    <ul>
+                        <li><a href="#">NEO Database</a></li>
+                        <li><a href="#">Impact Models</a></li>
+                        <li><a href="#">Research Data</a></li>
+                        <li><a href="#">API Documentation</a></li>
+                    </ul>
+                </div>
+                
+                <div class="footer-section">
+                    <h3>Contact</h3>
+                    <ul>
+                        <li>PDCO Operations</li>
+                        <li>+1-202-358-0000</li>
+                        <li>pdco@nasa.gov</li>
+                        <li>Emergency Protocols</li>
+                    </ul>
+                </div>
+            </div>
+            
+            <div class="copyright">
+                <p>&copy; 2024 NASA Planetary Defense Coordination Office - Advanced Analysis Platform</p>
+                <p style="color: var(--team-green); margin-top: 10px;">Secure Access - Classified Research Environment</p>
+            </div>
+        </div>
+    </footer>
+
+    <script>
+        // Enhanced Button Functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            // Smooth scrolling for all navigation links
+            document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+                anchor.addEventListener('click', function (e) {
+                    e.preventDefault();
+                    const target = document.querySelector(this.getAttribute('href'));
+                    if (target) {
+                        target.scrollIntoView({
+                            behavior: 'smooth',
+                            block: 'start'
+                        });
+                    }
+                });
+            });
+
+            // Enhanced slider functionality
+            const sliders = document.querySelectorAll('.slider');
+            sliders.forEach(slider => {
+                const display = slider.parentElement.querySelector('.value-display');
+                slider.addEventListener('input', function() {
+                    if (display) {
+                        if (this.min === '10' && this.max === '10000') {
+                            display.textContent = this.value + ' meters';
+                        } else if (this.min === '1' && this.max === '72') {
+                            display.textContent = this.value + ' km/s';
+                        } else {
+                            display.textContent = this.value + ' degrees';
+                        }
+                    }
+                });
+            });
+
+            // Professional animations on scroll
+            const observerOptions = {
+                threshold: 0.1,
+                rootMargin: '0px 0px -50px 0px'
+            };
+
+            const observer = new IntersectionObserver((entries) => {
+                entries.forEach(entry => {
+                    if (entry.isIntersecting) {
+                        entry.target.style.opacity = '1';
+                        entry.target.style.transform = 'translateY(0)';
+                    }
+                });
+            }, observerOptions);
+
+            // Observe all animated elements
+            document.querySelectorAll('.dashboard-card, .viz-card, .mitigation-card, .research-card').forEach(card => {
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(30px)';
+                card.style.transition = 'opacity 0.6s ease, transform 0.6s ease';
+                observer.observe(card);
+            });
+
+            // Enhanced button interactions
+            document.querySelectorAll('.expert-btn, .btn-primary, .btn-secondary').forEach(btn => {
+                btn.addEventListener('mouseenter', function() {
+                    this.style.transform = 'translateY(-5px) scale(1.02)';
+                });
+                
+                btn.addEventListener('mouseleave', function() {
+                    this.style.transform = 'translateY(0) scale(1)';
+                });
+            });
+
+            // Real-time data updates simulation
+            function updateDashboardData() {
+                const metrics = document.querySelectorAll('.metric-value');
+                metrics.forEach(metric => {
+                    const currentValue = parseInt(metric.textContent.replace(/,/g, ''));
+                    if (!isNaN(currentValue)) {
+                        const randomChange = Math.floor(Math.random() * 10) - 2;
+                        const newValue = Math.max(0, currentValue + randomChange);
+                        metric.textContent = newValue.toLocaleString();
+                    }
+                });
+            }
+
+            // Update dashboard every 30 seconds
+            setInterval(updateDashboardData, 30000);
+
+            // Chat Bot Functionality
+            const chatBot = document.getElementById('chatBot');
+            const chatWindow = document.getElementById('chatWindow');
+            const closeChat = document.getElementById('closeChat');
+            const chatMessages = document.getElementById('chatMessages');
+            const chatInput = document.getElementById('chatInput');
+            const sendMessage = document.getElementById('sendMessage');
+
+            // Chat responses database
+            const chatResponses = {
+                'hello': 'Hello! How can I assist you with NASA planetary defense and meteor impact analysis?',
+                'hi': 'Hi there! I specialize in meteor impacts, defense strategies, and NASA research. What would you like to know?',
+                'threat': 'Current threat level is GREEN. No immediate impact risks detected. 28,543 NEOs are being monitored.',
+                'defense': 'NASA employs multiple defense strategies: Kinetic impact (DART mission), gravity tractors, nuclear deflection, and laser systems.',
+                'research': 'Current research includes NEO Surveyor telescope, AI prediction models, material science, and international collaboration.',
+                'impact': 'Meteor impacts vary by size: 1m (annual), 10m (decadal), 100m (millennial), 10km+ (100 million years).',
+                'nasa': 'NASA Planetary Defense Coordination Office leads global efforts in asteroid detection, tracking, and deflection technologies.',
+                'dart': 'The DART mission in 2022 successfully demonstrated kinetic impact technology by altering asteroid Dimorphos orbit.',
+                'simulation': 'Our advanced simulator models impact energy, crater formation, seismic effects, and tsunami generation.',
+                'default': 'I can help with threat assessment, defense strategies, research updates, impact simulations, and NASA missions. What specific topic interests you?'
+            };
+
+            // Toggle chat window
+            chatBot.addEventListener('click', () => {
+                chatWindow.style.display = 'flex';
+                chatBot.style.display = 'none';
+            });
+
+            closeChat.addEventListener('click', () => {
+                chatWindow.style.display = 'none';
+                chatBot.style.display = 'flex';
+            });
+
+            // Send message function
+            function sendUserMessage() {
+                const message = chatInput.value.trim();
+                if (message) {
+                    // Add user message
+                    const userMessage = document.createElement('div');
+                    userMessage.className = 'message user-message';
+                    userMessage.textContent = message;
+                    chatMessages.appendChild(userMessage);
+                    
+                    // Clear input
+                    chatInput.value = '';
+                    
+                    // Scroll to bottom
+                    chatMessages.scrollTop = chatMessages.scrollHeight;
+                    
+                    // Generate bot response
+                    setTimeout(() => {
+                        const botResponse = generateResponse(message);
+                        const botMessage = document.createElement('div');
+                        botMessage.className = 'message bot-message';
+                        botMessage.textContent = botResponse;
+                        chatMessages.appendChild(botMessage);
+                        chatMessages.scrollTop = chatMessages.scrollHeight;
+                    }, 1000);
+                }
+            }
+
+            // Generate bot response
+            function generateResponse(message) {
+                const lowerMessage = message.toLowerCase();
+                
+                for (const [key, response] of Object.entries(chatResponses)) {
+                    if (lowerMessage.includes(key) && key !== 'default') {
+                        return response;
+                    }
+                }
+                
+                return chatResponses.default;
+            }
+
+            // Send message events
+            sendMessage.addEventListener('click', sendUserMessage);
+            chatInput.addEventListener('keypress', (e) => {
+                if (e.key === 'Enter') {
+                    sendUserMessage();
+                }
+            });
+        });
+
+        // Enhanced simulation functionality
+        function runAdvancedSimulation() {
+            const btn = document.querySelector('.btn-primary');
+            const originalText = btn.innerHTML;
+            
+            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running Simulation...';
+            btn.disabled = true;
+            
+            setTimeout(() => {
+                btn.innerHTML = '<i class="fas fa-check"></i> Simulation Complete';
+                btn.style.background = 'linear-gradient(45deg, var(--data-green), #2e7d32)';
+                
+                setTimeout(() => {
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    btn.style.background = 'linear-gradient(45deg, var(--nasa-red), var(--impact-orange))';
+                }, 2000);
+            }, 3000);
+        }
+    </script>
+</body>
+</html>
