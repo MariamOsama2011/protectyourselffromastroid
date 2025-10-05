@@ -5,6 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Advanced Meteor Impact Analysis - NASA PDCO</title>
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js"></script>
     <style>
         * {
             margin: 0;
@@ -357,6 +358,50 @@
             font-size: 1.2rem;
         }
 
+        /* Simulation Results */
+        .simulation-results {
+            display: none;
+            margin-top: 40px;
+            background: rgba(255, 255, 255, 0.05);
+            border-radius: 20px;
+            padding: 30px;
+            border: 2px solid var(--impact-orange);
+        }
+
+        .results-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+            margin-top: 20px;
+        }
+
+        .result-item {
+            background: rgba(255, 255, 255, 0.1);
+            padding: 20px;
+            border-radius: 15px;
+            text-align: center;
+        }
+
+        .result-value {
+            font-size: 2rem;
+            font-weight: 800;
+            color: var(--impact-orange);
+            margin: 10px 0;
+        }
+
+        .result-label {
+            color: #ccc;
+            font-size: 0.9rem;
+        }
+
+        .damage-assessment {
+            margin-top: 30px;
+            padding: 25px;
+            background: rgba(255, 107, 53, 0.1);
+            border-radius: 15px;
+            border-left: 4px solid var(--impact-orange);
+        }
+
         /* Enhanced Buttons */
         .btn-group {
             display: flex;
@@ -390,6 +435,53 @@
         .btn-primary:hover, .btn-secondary:hover {
             transform: translateY(-3px);
             box-shadow: 0 10px 25px rgba(0, 0, 0, 0.3);
+        }
+
+        /* 3D Meteor Section */
+        .meteor-3d-section {
+            padding: 100px 0;
+            background: linear-gradient(135deg, rgba(0, 180, 216, 0.05), rgba(0, 255, 136, 0.1));
+        }
+
+        .meteor-container {
+            width: 100%;
+            height: 500px;
+            position: relative;
+            margin: 30px auto;
+            border-radius: 15px;
+            overflow: hidden;
+            border: 2px solid var(--tech-blue);
+            background: linear-gradient(135deg, #0a0a2e, #000000);
+        }
+
+        #meteorCanvas {
+            width: 100%;
+            height: 100%;
+            display: block;
+        }
+
+        .meteor-controls {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-top: 20px;
+            flex-wrap: wrap;
+        }
+
+        .control-btn {
+            background: var(--tech-blue);
+            color: white;
+            border: none;
+            padding: 12px 24px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s;
+            font-weight: 600;
+        }
+
+        .control-btn:hover {
+            background: var(--impact-orange);
+            transform: translateY(-2px);
         }
 
         /* Enhanced Data Visualization */
@@ -469,7 +561,7 @@
             box-shadow: 0 20px 40px rgba(0, 0, 0, 0.4);
         }
 
-        /* Chat Bot Styles */
+        /* Enhanced Chat Bot */
         .chat-bot {
             position: fixed;
             bottom: 30px;
@@ -508,8 +600,8 @@
             position: fixed;
             bottom: 120px;
             right: 30px;
-            width: 380px;
-            height: 550px;
+            width: 400px;
+            height: 600px;
             background: rgba(26, 26, 46, 0.95);
             border-radius: 20px;
             box-shadow: 0 15px 35px rgba(0, 0, 0, 0.5);
@@ -554,7 +646,7 @@
         }
 
         .message {
-            max-width: 80%;
+            max-width: 85%;
             padding: 15px;
             border-radius: 18px;
             line-height: 1.4;
@@ -611,6 +703,38 @@
         .chat-input button:hover {
             background: var(--team-purple);
             transform: scale(1.1);
+        }
+
+        .typing-indicator {
+            display: none;
+            padding: 10px 15px;
+            background: var(--nasa-blue);
+            color: white;
+            border-radius: 18px;
+            align-self: flex-start;
+            margin-bottom: 10px;
+        }
+
+        .typing-dots {
+            display: inline-block;
+        }
+
+        .typing-dots span {
+            animation: typing 1.4s infinite;
+            opacity: 0;
+        }
+
+        .typing-dots span:nth-child(2) {
+            animation-delay: 0.2s;
+        }
+
+        .typing-dots span:nth-child(3) {
+            animation-delay: 0.4s;
+        }
+
+        @keyframes typing {
+            0%, 60%, 100% { opacity: 0; }
+            30% { opacity: 1; }
         }
 
         /* Enhanced Footer */
@@ -712,6 +836,10 @@
                 width: 320px;
                 right: 20px;
             }
+
+            .meteor-container {
+                height: 300px;
+            }
         }
 
         /* Professional Animations */
@@ -748,7 +876,7 @@
                 <ul>
                     <li><a href="#dashboard"><i class="fas fa-chart-line"></i> Dashboard</a></li>
                     <li><a href="#simulation"><i class="fas fa-cogs"></i> Simulation</a></li>
-                    <li><a href="#data"><i class="fas fa-database"></i> Data Analytics</a></li>
+                    <li><a href="#3d-meteor"><i class="fas fa-cube"></i> 3D Meteor</a></li>
                     <li><a href="#mitigation"><i class="fas fa-shield-alt"></i> Mitigation</a></li>
                     <li><a href="#research"><i class="fas fa-microscope"></i> Research</a></li>
                 </ul>
@@ -831,8 +959,8 @@
                             <i class="fas fa-arrows-alt-h"></i>
                             <span>Asteroid Diameter</span>
                         </div>
-                        <input type="range" min="10" max="10000" value="500" class="slider">
-                        <div class="value-display">500 meters</div>
+                        <input type="range" id="diameterSlider" min="10" max="10000" value="500" class="slider">
+                        <div class="value-display" id="diameterDisplay">500 meters</div>
                     </div>
                     
                     <div class="control-group">
@@ -840,8 +968,8 @@
                             <i class="fas fa-tachometer-alt"></i>
                             <span>Impact Velocity</span>
                         </div>
-                        <input type="range" min="1" max="72" value="17" class="slider">
-                        <div class="value-display">17 km/s</div>
+                        <input type="range" id="velocitySlider" min="1" max="72" value="17" class="slider">
+                        <div class="value-display" id="velocityDisplay">17 km/s</div>
                     </div>
                     
                     <div class="control-group">
@@ -849,8 +977,8 @@
                             <i class="fas fa-angle-double-right"></i>
                             <span>Impact Angle</span>
                         </div>
-                        <input type="range" min="5" max="90" value="45" class="slider">
-                        <div class="value-display">45 degrees</div>
+                        <input type="range" id="angleSlider" min="5" max="90" value="45" class="slider">
+                        <div class="value-display" id="angleDisplay">45 degrees</div>
                     </div>
                     
                     <div class="control-group">
@@ -858,11 +986,11 @@
                             <i class="fas fa-globe-americas"></i>
                             <span>Target Composition</span>
                         </div>
-                        <select class="expert-select">
-                            <option>Continental Crust</option>
-                            <option>Oceanic Crust</option>
-                            <option>Urban Area</option>
-                            <option>Ice Sheet</option>
+                        <select id="locationSelect" class="expert-select">
+                            <option value="land">Continental Crust</option>
+                            <option value="ocean">Oceanic Crust</option>
+                            <option value="city">Urban Area</option>
+                            <option value="ice">Ice Sheet</option>
                         </select>
                     </div>
                 </div>
@@ -872,57 +1000,64 @@
                         <i class="fas fa-calculator"></i>
                         Run Simulation
                     </button>
-                    <button class="btn-secondary">
-                        <i class="fas fa-download"></i>
-                        Export Data
+                    <button class="btn-secondary" onclick="resetSimulation()">
+                        <i class="fas fa-redo"></i>
+                        Reset
                     </button>
-                    <button class="btn-secondary">
-                        <i class="fas fa-chart-line"></i>
-                        Advanced Analytics
-                    </button>
+                </div>
+
+                <!-- Simulation Results -->
+                <div class="simulation-results" id="simulationResults">
+                    <h3 style="color: var(--impact-orange); margin-bottom: 20px;">
+                        <i class="fas fa-chart-bar"></i> Simulation Results
+                    </h3>
+                    
+                    <div class="results-grid">
+                        <div class="result-item">
+                            <div class="result-value" id="energyResult">0 MT</div>
+                            <div class="result-label">Impact Energy</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-value" id="tntResult">0</div>
+                            <div class="result-label">Hiroshima Bombs Equivalent</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-value" id="craterResult">0 km</div>
+                            <div class="result-label">Crater Diameter</div>
+                        </div>
+                        <div class="result-item">
+                            <div class="result-value" id="quakeResult">0.0</div>
+                            <div class="result-label">Earthquake Magnitude</div>
+                        </div>
+                    </div>
+
+                    <div class="damage-assessment">
+                        <h4 style="color: var(--impact-orange); margin-bottom: 15px;">
+                            <i class="fas fa-exclamation-triangle"></i> Damage Assessment
+                        </h4>
+                        <div id="damageDescription">No damage assessment available. Run simulation to see results.</div>
+                    </div>
                 </div>
             </div>
         </div>
     </section>
 
-    <!-- Data Visualization Section -->
-    <section class="data-viz" id="data">
+    <!-- 3D Meteor Section -->
+    <section class="meteor-3d-section" id="3d-meteor">
         <div class="container">
-            <h2 class="section-title">Impact Data Analytics</h2>
-            <p class="section-subtitle">Advanced visualization of impact effects and risk assessment metrics</p>
+            <h2 class="section-title">Interactive 3D Meteor Model</h2>
+            <p class="section-subtitle">Explore a realistic 3D meteor model with advanced visualization</p>
             
-            <div class="viz-container">
-                <div class="viz-card animate-fadeInUp">
-                    <div class="card-header">
-                        <i class="fas fa-fire"></i>
-                        <h3>Energy Distribution</h3>
-                    </div>
-                    <p>Thermal radiation and shockwave propagation analysis</p>
-                </div>
-                
-                <div class="viz-card animate-fadeInUp">
-                    <div class="card-header">
-                        <i class="fas fa-mountain"></i>
-                        <h3>Crater Formation</h3>
-                    </div>
-                    <p>3D modeling of transient and final crater dimensions</p>
-                </div>
-                
-                <div class="viz-card animate-fadeInUp">
-                    <div class="card-header">
-                        <i class="fas fa-wave-square"></i>
-                        <h3>Seismic Effects</h3>
-                    </div>
-                    <p>Earthquake magnitude and ground motion simulation</p>
-                </div>
-                
-                <div class="viz-card animate-fadeInUp">
-                    <div class="card-header">
-                        <i class="fas fa-water"></i>
-                        <h3>Tsunami Modeling</h3>
-                    </div>
-                    <p>Ocean impact wave propagation and coastal effects</p>
-                </div>
+            <div class="meteor-container">
+                <canvas id="meteorCanvas"></canvas>
+            </div>
+            
+            <div class="meteor-controls">
+                <button class="control-btn" id="rotateBtn">Auto Rotate: ON</button>
+                <button class="control-btn" id="zoomInBtn">Zoom In</button>
+                <button class="control-btn" id="zoomOutBtn">Zoom Out</button>
+                <button class="control-btn" id="resetViewBtn">Reset View</button>
+                <button class="control-btn" id="changeMaterialBtn">Change Material</button>
             </div>
         </div>
     </section>
@@ -1019,23 +1154,33 @@
         </div>
     </section>
 
-    <!-- Chat Bot -->
+    <!-- Enhanced Chat Bot -->
     <div class="chat-bot" id="chatBot">
         <i class="fas fa-robot"></i>
     </div>
 
     <div class="chat-window" id="chatWindow">
         <div class="chat-header">
-            <h3><i class="fas fa-robot"></i> NASA Assistant</h3>
+            <h3><i class="fas fa-robot"></i> NASA AI Assistant</h3>
             <button class="close-chat" id="closeChat"><i class="fas fa-times"></i></button>
         </div>
         <div class="chat-messages" id="chatMessages">
             <div class="message bot-message">
-                Hello! I'm your NASA Assistant. How can I help you with planetary defense and meteor impact analysis today?
+                Hello! I'm your NASA AI Assistant. I can help you with:<br>
+                • Impact simulations and calculations<br>
+                • Planetary defense strategies<br>
+                • Meteor and asteroid data<br>
+                • NASA research and missions<br><br>
+                What would you like to know?
+            </div>
+        </div>
+        <div class="typing-indicator" id="typingIndicator">
+            <div class="typing-dots">
+                <span>●</span><span>●</span><span>●</span>
             </div>
         </div>
         <div class="chat-input">
-            <input type="text" id="chatInput" placeholder="Ask about meteors, defense, or research...">
+            <input type="text" id="chatInput" placeholder="Ask about impacts, defense, or research...">
             <button id="sendMessage"><i class="fas fa-paper-plane"></i></button>
         </div>
     </div>
@@ -1055,7 +1200,7 @@
                     <ul>
                         <li><a href="#dashboard">Threat Dashboard</a></li>
                         <li><a href="#simulation">Impact Simulation</a></li>
-                        <li><a href="#data">Data Analytics</a></li>
+                        <li><a href="#3d-meteor">3D Meteor</a></li>
                         <li><a href="#research">Research Papers</a></li>
                     </ul>
                 </div>
@@ -1111,11 +1256,11 @@
                 const display = slider.parentElement.querySelector('.value-display');
                 slider.addEventListener('input', function() {
                     if (display) {
-                        if (this.min === '10' && this.max === '10000') {
+                        if (this.id === 'diameterSlider') {
                             display.textContent = this.value + ' meters';
-                        } else if (this.min === '1' && this.max === '72') {
+                        } else if (this.id === 'velocitySlider') {
                             display.textContent = this.value + ' km/s';
-                        } else {
+                        } else if (this.id === 'angleSlider') {
                             display.textContent = this.value + ' degrees';
                         }
                     }
@@ -1172,108 +1317,119 @@
             // Update dashboard every 30 seconds
             setInterval(updateDashboardData, 30000);
 
-            // Chat Bot Functionality
-            const chatBot = document.getElementById('chatBot');
-            const chatWindow = document.getElementById('chatWindow');
-            const closeChat = document.getElementById('closeChat');
-            const chatMessages = document.getElementById('chatMessages');
-            const chatInput = document.getElementById('chatInput');
-            const sendMessage = document.getElementById('sendMessage');
+            // Initialize 3D Meteor
+            init3DMeteor();
 
-            // Chat responses database
-            const chatResponses = {
-                'hello': 'Hello! How can I assist you with NASA planetary defense and meteor impact analysis?',
-                'hi': 'Hi there! I specialize in meteor impacts, defense strategies, and NASA research. What would you like to know?',
-                'threat': 'Current threat level is GREEN. No immediate impact risks detected. 28,543 NEOs are being monitored.',
-                'defense': 'NASA employs multiple defense strategies: Kinetic impact (DART mission), gravity tractors, nuclear deflection, and laser systems.',
-                'research': 'Current research includes NEO Surveyor telescope, AI prediction models, material science, and international collaboration.',
-                'impact': 'Meteor impacts vary by size: 1m (annual), 10m (decadal), 100m (millennial), 10km+ (100 million years).',
-                'nasa': 'NASA Planetary Defense Coordination Office leads global efforts in asteroid detection, tracking, and deflection technologies.',
-                'dart': 'The DART mission in 2022 successfully demonstrated kinetic impact technology by altering asteroid Dimorphos orbit.',
-                'simulation': 'Our advanced simulator models impact energy, crater formation, seismic effects, and tsunami generation.',
-                'default': 'I can help with threat assessment, defense strategies, research updates, impact simulations, and NASA missions. What specific topic interests you?'
-            };
-
-            // Toggle chat window
-            chatBot.addEventListener('click', () => {
-                chatWindow.style.display = 'flex';
-                chatBot.style.display = 'none';
-            });
-
-            closeChat.addEventListener('click', () => {
-                chatWindow.style.display = 'none';
-                chatBot.style.display = 'flex';
-            });
-
-            // Send message function
-            function sendUserMessage() {
-                const message = chatInput.value.trim();
-                if (message) {
-                    // Add user message
-                    const userMessage = document.createElement('div');
-                    userMessage.className = 'message user-message';
-                    userMessage.textContent = message;
-                    chatMessages.appendChild(userMessage);
-                    
-                    // Clear input
-                    chatInput.value = '';
-                    
-                    // Scroll to bottom
-                    chatMessages.scrollTop = chatMessages.scrollHeight;
-                    
-                    // Generate bot response
-                    setTimeout(() => {
-                        const botResponse = generateResponse(message);
-                        const botMessage = document.createElement('div');
-                        botMessage.className = 'message bot-message';
-                        botMessage.textContent = botResponse;
-                        chatMessages.appendChild(botMessage);
-                        chatMessages.scrollTop = chatMessages.scrollHeight;
-                    }, 1000);
-                }
-            }
-
-            // Generate bot response
-            function generateResponse(message) {
-                const lowerMessage = message.toLowerCase();
-                
-                for (const [key, response] of Object.entries(chatResponses)) {
-                    if (lowerMessage.includes(key) && key !== 'default') {
-                        return response;
-                    }
-                }
-                
-                return chatResponses.default;
-            }
-
-            // Send message events
-            sendMessage.addEventListener('click', sendUserMessage);
-            chatInput.addEventListener('keypress', (e) => {
-                if (e.key === 'Enter') {
-                    sendUserMessage();
-                }
-            });
+            // Initialize Enhanced Chat Bot
+            initChatBot();
         });
 
-        // Enhanced simulation functionality
-        function runAdvancedSimulation() {
-            const btn = document.querySelector('.btn-primary');
-            const originalText = btn.innerHTML;
+        // 3D Meteor Implementation
+        function init3DMeteor() {
+            const canvas = document.getElementById('meteorCanvas');
+            const scene = new THREE.Scene();
+            const camera = new THREE.PerspectiveCamera(75, canvas.clientWidth / canvas.clientHeight, 0.1, 1000);
+            const renderer = new THREE.WebGLRenderer({ canvas, antialias: true, alpha: true });
             
-            btn.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Running Simulation...';
-            btn.disabled = true;
+            renderer.setSize(canvas.clientWidth, canvas.clientHeight);
+            renderer.setClearColor(0x000000, 0);
             
-            setTimeout(() => {
-                btn.innerHTML = '<i class="fas fa-check"></i> Simulation Complete';
-                btn.style.background = 'linear-gradient(45deg, var(--data-green), #2e7d32)';
+            // Enhanced Lighting
+            const ambientLight = new THREE.AmbientLight(0x404040, 0.6);
+            scene.add(ambientLight);
+            
+            const directionalLight = new THREE.DirectionalLight(0xffffff, 0.8);
+            directionalLight.position.set(10, 10, 5);
+            scene.add(directionalLight);
+            
+            const pointLight = new THREE.PointLight(0xff4500, 0.5, 100);
+            pointLight.position.set(5, 5, 5);
+            scene.add(pointLight);
+            
+            // Create advanced meteor geometry
+            const meteorGroup = new THREE.Group();
+            
+            // Main meteor body with irregular shape
+            const meteorGeometry = new THREE.SphereGeometry(1, 12, 10);
+            const positions = meteorGeometry.attributes.position.array;
+            
+            // Add surface irregularities
+            for (let i = 0; i < positions.length; i += 3) {
+                const x = positions[i];
+                const y = positions[i + 1];
+                const z = positions[i + 2];
                 
-                setTimeout(() => {
-                    btn.innerHTML = originalText;
-                    btn.disabled = false;
-                    btn.style.background = 'linear-gradient(45deg, var(--nasa-red), var(--impact-orange))';
-                }, 2000);
-            }, 3000);
-        }
-    </script>
-</body>
-</html>
+                // Add random surface variations
+                const distance = Math.sqrt(x*x + y*y + z*z);
+                const noise = (Math.random() - 0.5) * 0.3;
+                
+                positions[i] = x * (1 + noise/distance);
+                positions[i + 1] = y * (1 + noise/distance);
+                positions[i + 2] = z * (1 + noise/distance);
+            }
+            
+            meteorGeometry.computeVertexNormals();
+            
+            const meteorMaterial = new THREE.MeshPhongMaterial({ 
+                color: 0x8B4513,
+                shininess: 50,
+                specular: 0x222222
+            });
+            
+            const meteor = new THREE.Mesh(meteorGeometry, meteorMaterial);
+            meteor.scale.set(1.3, 0.9, 1.1);
+            meteorGroup.add(meteor);
+            
+            // Add surface craters
+            const craterGeometry = new THREE.SphereGeometry(0.2, 8, 6);
+            const craterMaterial = new THREE.MeshPhongMaterial({
+                color: 0x654321,
+                shininess: 10
+            });
+            
+            for (let i = 0; i < 8; i++) {
+                const crater = new THREE.Mesh(craterGeometry, craterMaterial);
+                const angle = (i / 8) * Math.PI * 2;
+                const radius = 0.8 + Math.random() * 0.2;
+                
+                crater.position.set(
+                    Math.cos(angle) * radius,
+                    (Math.random() - 0.5) * 0.6,
+                    Math.sin(angle) * radius
+                );
+                crater.scale.set(0.3 + Math.random() * 0.2, 0.2 + Math.random() * 0.1, 0.3 + Math.random() * 0.2);
+                meteorGroup.add(crater);
+            }
+            
+            // Add glowing trail particles
+            const particleCount = 50;
+            const particles = new THREE.BufferGeometry();
+            const particlePositions = new Float32Array(particleCount * 3);
+            const particleSizes = new Float32Array(particleCount);
+            
+            for (let i = 0; i < particleCount; i++) {
+                const i3 = i * 3;
+                particlePositions[i3] = (Math.random() - 0.5) * 0.5;
+                particlePositions[i3 + 1] = -1.5 - Math.random() * 3;
+                particlePositions[i3 + 2] = (Math.random() - 0.5) * 0.5;
+                particleSizes[i] = Math.random() * 0.1 + 0.05;
+            }
+            
+            particles.setAttribute('position', new THREE.BufferAttribute(particlePositions, 3));
+            particles.setAttribute('size', new THREE.BufferAttribute(particleSizes, 1));
+            
+            const particleMaterial = new THREE.PointsMaterial({
+                color: 0xff6b35,
+                size: 0.1,
+                transparent: true,
+                opacity: 0.6,
+                blending: THREE.AdditiveBlending
+            });
+            
+            const particleSystem = new THREE.Points(particles, particleMaterial);
+            meteorGroup.add(particleSystem);
+            
+            scene.add(meteorGroup);
+            
+            camera.position.z = 5;
+            
